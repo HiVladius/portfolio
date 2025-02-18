@@ -21,7 +21,6 @@ export function ContactSection() {
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
-    const from = formData.get("from") as string;
     const message = formData.get("message") as string;
 
     await sendMail({ from:"onboarding@resend.dev", to: "vladpscio@gmail.com", html: message });
