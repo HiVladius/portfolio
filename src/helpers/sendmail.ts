@@ -5,6 +5,8 @@ export interface MailData {
     html: string;
 }
 
+// Response from the send-mail API
+
 
 
 export interface SendMailResponse {
