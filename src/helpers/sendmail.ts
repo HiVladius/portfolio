@@ -5,11 +5,16 @@ export interface MailData {
     html: string;
 }
 
-let mailEndPoint = import.meta.env.VITE_MAIL_ENDPOINT;
 
-export const sendMail = async (mailData: MailData): Promise<any> => {
+
+export interface SendMailResponse {
+    success: boolean;
+    message: string;
+}
+
+export const sendMail = async (mailData: MailData): Promise<SendMailResponse> => {
     try {
-        const response = await fetch(mailEndPoint, {
+        const response = await fetch('https://back-mail-coral.vercel.app/send-mail', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -21,21 +26,10 @@ export const sendMail = async (mailData: MailData): Promise<any> => {
             throw new Error(`Failed to send mail: ${response.statusText}`);
         }
 
-        return await response.json();
+        const data = await response.json();
+        return data as SendMailResponse;
     } catch (error) {
         console.error('Error sending mail:', error);
         throw error;
     }
 };
-
-// Example usage
-// (async () => {
-//   const data: MailData = {
-//     from: "onboarding@resend.dev",
-//     to: "vladpsico@gmail.com",
-//     subject: "Contacto",
-//     html: "<p>me interesa conocerte y saber mas sobre tu trabajo</p>"
-//   }
-//   const result = await sendMail(data);
-//   console.log(result);
-// })();

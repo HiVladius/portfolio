@@ -45,7 +45,7 @@ export function ContactSection() {
     const formData = new FormData(event.currentTarget);
     const name = formData.get("name");
     const message = formData.get("message");
-    console.log(name, message);
+    
 
     try {
       await sendMail({
