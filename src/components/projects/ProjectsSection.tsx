@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
-import { Octokit } from 'octokit';
-import { ExternalLink, Star, GitFork, Clock } from 'lucide-react';
+import { useEffect, useRef, useState } from "react";
+import { Octokit } from "octokit";
+import { Clock, ExternalLink, GitFork, Star } from "lucide-react";
+import { LoadingSpinner } from "./LoadingSpinner";
 
 interface GitHubRepo {
   id: number;
@@ -14,62 +15,89 @@ interface GitHubRepo {
   topics: string[];
 }
 
-export function ProjectsSection() {
+export const ProjectsSection = () => {
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
+  const observer = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
     const fetchRepos = async () => {
       try {
         const octokit = new Octokit({
-          auth: import.meta.env.VITE_GITHUB_KEY // You'll need to add this to your .env file
+          auth: import.meta.env.VITE_GITHUB_KEY, // You'll need to add this to your .env file
         });
 
-        const response = await octokit.request('GET /user/repos', {
-          sort: 'updated',
-          per_page: 20,
-          visibility: 'public'
+        const response = await octokit.request("GET /user/repos", {
+          sort: "updated",
+          per_page: 6, // Cargar 6 repositorios por página
+          page,
+          visibility: "public",
         });
 
         const reposWithTopics = await Promise.all(
           response.data.map(async (repo) => {
-            const topicsResponse = await octokit.request('GET /repos/{owner}/{repo}/topics', {
-              owner: repo.owner.login,
-              repo: repo.name,
-              headers: {
-                'X-GitHub-Api-Version': '2022-11-28'
-              }
-            });
-            return { ...repo, topics: topicsResponse.data.names, description: repo.description ?? '' };
-          })
+            const topicsResponse = await octokit.request(
+              "GET /repos/{owner}/{repo}/topics",
+              {
+                owner: repo.owner.login,
+                repo: repo.name,
+                headers: {
+                  "X-GitHub-Api-Version": "2022-11-28",
+                },
+              },
+            );
+            return {
+              ...repo,
+              topics: topicsResponse.data.names,
+              description: repo.description ?? "",
+            };
+          }),
         );
 
-        setRepos(reposWithTopics);
+        setRepos((prevRepos) => [...prevRepos, ...reposWithTopics]);
         setLoading(false);
       } catch (err) {
-        setError('Failed to fetch GitHub repositories');
+        setError("Failed to fetch GitHub repositories");
         setLoading(false);
-        console.error('Error fetching repos:', err);
+        console.error("Error fetching repos:", err);
       }
     };
 
     fetchRepos();
-  }, []);
+  }, [page]);
 
-  const formatDate = (dateString: string | null) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  useEffect(() => {
+    if (observer.current) observer.current.disconnect();
 
-  if (loading) {
+    const handleObserver = (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
+        setPage((prevPage) => prevPage + 1);
+      }
+    };
+
+    observer.current = new IntersectionObserver(handleObserver);
+    
+    const element = document.querySelector("#load-more");
+    if (element) observer.current.observe(element);
+
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [repos]);
+
+  const filteredRepos = selectedLanguage
+    ? repos.filter((repo) => repo.language === selectedLanguage)
+    : repos;
+
+  if (loading && page === 1) {
     return (
       <div className="min-h-screen bg-black text-white p-8 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500">
+        </div>
       </div>
     );
   }
@@ -85,17 +113,42 @@ export function ProjectsSection() {
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
-      <h1 className="text-4xl font-bold mb-12 animate-fade-in">My GitHub Projects</h1>
+      <h1 className="text-4xl font-bold mb-12 animate-fade-in flex items-center gap-2">
+        My GitHub Projects
+      </h1>
+      <div className="mb-4">
+        <label htmlFor="language" className="block text-sm font-medium text-gray-400">
+          Filter by Language
+        </label>
+        <select
+          id="language"
+          name="language"
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-black text-white"
+          value={selectedLanguage}
+          onChange={(e) => {
+            setSelectedLanguage(e.target.value);
+            setPage(1);
+            setRepos([]);
+          }}
+        >
+          <option value="">All Languages</option>
+          {[...new Set(repos.map((repo) => repo.language).filter(Boolean))].map((language) => (
+            <option key={language} value={language || ""}>
+              {language}
+            </option>
+          ))}
+        </select>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {repos.map((repo) => (
-          <div 
-            key={repo.id}
+        {filteredRepos.map((repo) => (
+          <div
+            key={`${repo.id}-${repo.name}`}
             className="bg-zinc-900/50 rounded-xl overflow-hidden shadow-xl hover:shadow-red-500/20 transition-all duration-300 flex flex-col"
           >
             <div className="p-6 flex-1">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-xl font-bold">{repo.name}</h3>
-                <a 
+                <a
                   href={repo.html_url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -104,11 +157,13 @@ export function ProjectsSection() {
                   <ExternalLink size={20} />
                 </a>
               </div>
-              <p className="text-gray-400 mb-4 line-clamp-2">{repo.description || 'No description available'}</p>
-              
+              <p className="text-gray-400 mb-4 line-clamp-2">
+                {repo.description || "No description available"}
+              </p>
+
               <div className="flex flex-wrap gap-2 mb-4">
                 {repo.topics.map((topic) => (
-                  <span 
+                  <span
                     key={topic}
                     className="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-sm"
                   >
@@ -120,7 +175,8 @@ export function ProjectsSection() {
               {repo.language && (
                 <div className="mb-4">
                   <span className="text-sm font-medium text-gray-400">
-                    Main language: <span className="text-white">{repo.language}</span>
+                    Main language: {" "}
+                    <span className="text-white">{repo.language}</span>
                   </span>
                 </div>
               )}
@@ -140,13 +196,18 @@ export function ProjectsSection() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Clock size={16} />
-                  <span>Updated {formatDate(repo.updated_at)}</span>
+                  <span>
+                    Updated {" "}
+                    {new Date(repo.updated_at ?? "").toLocaleDateString()}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         ))}
       </div>
+      {loading && <LoadingSpinner />}
+      <div id="load-more" className="h-10"></div>
     </div>
   );
-}
+};

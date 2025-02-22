@@ -9,7 +9,6 @@ import { ProjectsSection } from "./components/projects/ProjectsSection";
 import { ContactSection } from "./components/ContactSection";
 import {
   BrowserRouter as Router,
-  Navigate,
   Route,
   Routes,
 } from "react-router-dom";
