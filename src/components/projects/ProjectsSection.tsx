@@ -32,7 +32,7 @@ export const ProjectsSection = () => {
 
         const response = await octokit.request("GET /user/repos", {
           sort: "updated",
-          per_page: 6, // Cargar 6 repositorios por página
+          per_page: 10, // Cargar 10 repositorios por página
           page,
           visibility: "public",
         });
@@ -80,7 +80,7 @@ export const ProjectsSection = () => {
     };
 
     observer.current = new IntersectionObserver(handleObserver);
-    
+
     const element = document.querySelector("#load-more");
     if (element) observer.current.observe(element);
 
@@ -117,7 +117,10 @@ export const ProjectsSection = () => {
         My GitHub Projects
       </h1>
       <div className="mb-4">
-        <label htmlFor="language" className="block text-sm font-medium text-gray-400">
+        <label
+          htmlFor="language"
+          className="block text-sm font-medium text-gray-400"
+        >
           Filter by Language
         </label>
         <select
@@ -132,14 +135,16 @@ export const ProjectsSection = () => {
           }}
         >
           <option value="">All Languages</option>
-          {[...new Set(repos.map((repo) => repo.language).filter(Boolean))].map((language) => (
-            <option key={language} value={language || ""}>
-              {language}
-            </option>
-          ))}
+          {[...new Set(repos.map((repo) => repo.language).filter(Boolean))].map(
+            (language) => (
+              <option key={language} value={language || ""}>
+                {language}
+              </option>
+            )
+          )}
         </select>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {filteredRepos.map((repo) => (
           <div
             key={`${repo.id}-${repo.name}`}
@@ -175,7 +180,7 @@ export const ProjectsSection = () => {
               {repo.language && (
                 <div className="mb-4">
                   <span className="text-sm font-medium text-gray-400">
-                    Main language: {" "}
+                    Main language:{"  "}
                     <span className="text-white">{repo.language}</span>
                   </span>
                 </div>
@@ -197,7 +202,7 @@ export const ProjectsSection = () => {
                 <div className="flex items-center gap-1">
                   <Clock size={16} />
                   <span>
-                    Updated {" "}
+                    Updated{"  "}
                     {new Date(repo.updated_at ?? "").toLocaleDateString()}
                   </span>
                 </div>

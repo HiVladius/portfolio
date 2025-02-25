@@ -6,7 +6,7 @@ import { LoadingScreen } from "./components/LoadingScreen";
 import { ProfileSelector } from "./components/ProfileSelector";
 import { AboutSection } from "./components/about/AboutSection";
 import { ProjectsSection } from "./components/projects/ProjectsSection";
-import { ContactSection } from "./components/ContactSection";
+import { ContactSection } from "./components/contact/ContactSection";
 import {
   BrowserRouter as Router,
   Route,
@@ -16,6 +16,8 @@ import { Navbar } from "./components/Navbar";
 import { NotFound } from "./components/NotFound";
 
 import "./index.css";
+
+import '../src/translation/config';
 
 const AppWrapper = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +35,7 @@ const AppWrapper = () => {
   }
 
   return (
-    <>
+    
       <Router>
         <Routes>
           <Route path="/" element={<ProfileSelector />} />
@@ -44,7 +46,7 @@ const AppWrapper = () => {
         </Routes>
         <Navbar />
       </Router>
-    </>
+    
   );
 };
 

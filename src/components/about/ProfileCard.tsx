@@ -1,4 +1,5 @@
 import { ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 
 interface ProfileCardProps {
@@ -11,9 +12,12 @@ interface ProfileCardProps {
 }
 
 export function ProfileCard(
-    { onOpenModal, onHoverChange, isHovered, title, description, image }:
-        ProfileCardProps,
-) {
+    { onOpenModal, onHoverChange, isHovered, title, description, image }:ProfileCardProps,) 
+    
+
+{
+
+    const { t } = useTranslation();
     return (
         <div
             className="relative w-96 rounded-xl overflow-hidden cursor-pointer shadow-2xl transition-all duration-300 hover:shadow-red-500/20"
@@ -47,7 +51,7 @@ export function ProfileCard(
                     }}
                     className="flex items-center gap-2 text-white/90 hover:text-red-500 transition-colors group"
                 >
-                    <span>Ver más información</span>
+                    <span>{t("more-info.info")}</span>
                     <ChevronDown
                         className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                         size={20}
