@@ -5,18 +5,17 @@ export interface MailData {
     html: string;
 }
 
-// Response from the send-mail API
-
-
-
+// 
 export interface SendMailResponse {
     success: boolean;
     message: string;
 }
 
+const mail = import.meta.env.VITE_EMAIL_SERVICE.toString();
+
 export const sendMail = async (mailData: MailData): Promise<SendMailResponse> => {
     try {
-        const response = await fetch('https://back-mail-coral.vercel.app/send-mail', {
+        const response = await fetch(mail, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

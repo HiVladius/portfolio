@@ -19,10 +19,10 @@ export function AboutSection() {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen bg-black text-white p-8 gap-8 items-center">
-        <div className="flex-1 w-full max-w-6xl">
-          <h1 className="text-9xl font-bold mb-12 animate-fade-in text-center">
-            {t("about-section.sobre mi")}
+      <div className="flex flex-col min-h-screen bg-black text-white p-8 gap-8 items-center justify-center w-full mx-auto text-center">
+        <div className="flex-1 w-full max-w-6xl ">
+          <h1 className="text-9xl font-bold mb-12 animate-fade-in text-center mt-9">
+            {t("about-section.sobre_mi")}
           </h1>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-20 mx-auto justify-items-center">
             <div className="flex justify-center animate-fade-in">
@@ -31,14 +31,14 @@ export function AboutSection() {
                 onHoverChange={setIsHovered}
                 image={image}
                 isHovered={isHovered}
-                title={t("about-section.resumen profesional")}
+                title={t("about-section.resumen_profesional")}
                 description={t("about-section.res-1")}
               />
               <ModalProfile
                 isOpen={isModalOpen}
                 image={image}
                 onClose={() => setIsModalOpen(false)}
-                title={t("about-section.resumen profesional")}
+                title={t("about-section.resumen_profesional")}
                 firstLine={t("about-section.res-2")}
                 secondLine={t("about-section.res-2.1")}
                 thirdLine={t("about-section.res-2.2")}

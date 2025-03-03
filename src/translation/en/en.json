@@ -7,8 +7,8 @@
     },
   
     "about-section": {
-      "sobre mi": "About me",
-      "resumen profesional": "Professional summary",
+      "sobre_mi": "About me",
+      "resumen_profesional": "Professional summary",
       "res-1": "A software developer with over 3 years of experience, specializing in JavaScript/TypeScript and React. Proven track record in telecommunications projects, including the development of IVR, CRM, and custom SMS distribution systems for marketing campaigns. Expertise in telecommunications carriers such as Twilio, a virtual number system capable of linking web calls with clients and internal services.",
       "res-2": "A software developer with over 3 years of experience, specializing in JavaScript/TypeScript and React. Proven track record in telecommunications projects, including the development of IVR, CRM, and custom SMS distribution systems for marketing campaigns. Expertise in telecommunications carriers such as Twilio, a virtual number system capable of linking web calls with clients and internal services.",
       "res-2.1": "Effective leadership of development teams with successful outcomes for clients and employers. Passionate about programming and committed to delivering high-quality solutions. Skilled in developing backend endpoints to support project requirements.",
@@ -46,7 +46,8 @@
       "message": "Message",
       "send": "Send",
       "send-message": "Message sent successfully",
-      "send-error": "Error sending message"
+      "send-error": "Messages can only be sent every 10 minutes",
+      "email": "Email"
     }
   }
   

@@ -48,7 +48,8 @@
         "message": "Mensaje",
         "send": "Enviar",
         "send-message": "Mensaje enviado exitosamente",
-        "send-error": "Error al enviar el mensaje"
+        "send-error": "Solo se pueden enviar mensajes cada 10 minutos",
+        "email": "Correo electrónico"
     }
 
 
