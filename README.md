@@ -1,5 +1,7 @@
 # Portfolio Vlad
 
+<img src="/src/assets/logo2-removebg.png" style="display:block; margin:10px auto 0 auto; border:10px solid #000; border-radius:8px;" />
+
 Este proyecto es un portafolio personal desarrollado con React, Vite y TypeScript. Utiliza TailwindCSS para los estilos y está estructurado en componentes reutilizables. El objetivo principal es mostrar información personal, proyectos, y permitir el contacto a través de un formulario.
 
 ## Estructura del Proyecto
