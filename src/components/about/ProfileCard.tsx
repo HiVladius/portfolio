@@ -1,6 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
+import { OptimizedImage } from "../common/OptimizedImage";
 
 interface ProfileCardProps {
     onOpenModal: () => void;
@@ -13,10 +13,7 @@ interface ProfileCardProps {
 
 export function ProfileCard(
     { onOpenModal, onHoverChange, isHovered, title, description, image }:ProfileCardProps,) 
-    
-
 {
-
     const { t } = useTranslation();
     return (
         <div
@@ -25,10 +22,12 @@ export function ProfileCard(
             onMouseLeave={() => onHoverChange(false)}
             onClick={onOpenModal}
         >
-            <img
+            <OptimizedImage
                 src={image}
-                alt="Profile"
-                className="w-full h-96 object-cover transition duration-300 ease-out hover:scale-105"
+                alt={title}
+                width={384}
+                height={384}
+                className="w-full h-96"
             />
 
             <div
