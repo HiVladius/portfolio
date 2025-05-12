@@ -5,7 +5,7 @@ interface ModalProfileProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;
-    firstLine: React.ReactNode;
+    firstLine?: React.ReactNode;
     secondLine?: React.ReactNode;
     thirdLine?: React.ReactNode;
     image: string;

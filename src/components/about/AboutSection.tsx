@@ -56,9 +56,8 @@ export function AboutSection() {
               <ModalProfile
                 isOpen={isHobbiesModalOpen}
                 onClose={() => setIsHobbiesModalOpen(false)}
-                title="Mis Hobbies"
+                title={t("hobbies-section.my hobbies")}
                 image={hobbie}
-                firstLine={t("hobbies-section.my hobbies")}
                 secondLine={
                   <>
                     <h3 className="text-lg font-semibold mb-2">

@@ -57,7 +57,14 @@ export const ProjectsSection = () => {
           }),
         );
 
-        setRepos((prevRepos) => [...prevRepos, ...reposWithTopics]);
+        setRepos((prevRepos) => {
+          const allRepos = [...prevRepos, ...reposWithTopics];
+          const uniqueRepos = allRepos.filter(
+            (repo, index, self) =>
+              self.findIndex((r) => r.id === repo.id) === index
+          );
+          return uniqueRepos;
+        });
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch GitHub repositories");
@@ -147,7 +154,7 @@ export const ProjectsSection = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {filteredRepos.map((repo) => (
           <div
-            key={`${repo.id}-${repo.name}`}
+            key={repo.id}
             className="bg-zinc-900/50 rounded-xl overflow-hidden shadow-xl hover:shadow-red-500/20 transition-all duration-300 flex flex-col"
           >
             <div className="p-6 flex-1">
@@ -169,7 +176,7 @@ export const ProjectsSection = () => {
               <div className="flex flex-wrap gap-2 mb-4">
                 {repo.topics.map((topic) => (
                   <span
-                    key={topic}
+                    key={`${repo.id}-${topic}`}
                     className="px-3 py-1 bg-red-500/10 text-red-500 rounded-full text-sm"
                   >
                     {topic}
@@ -211,7 +218,7 @@ export const ProjectsSection = () => {
           </div>
         ))}
       </div>
-      {loading && <LoadingSpinner />}
+      {loading ? <LoadingSpinner /> : null} 
       <div id="load-more" className="h-10"></div>
     </div>
   );
