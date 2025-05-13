@@ -11,7 +11,7 @@ export function Navbar() {
   const shakeAnimation = {
     whileHover: {
       rotate: [0, -10, 10, -10, 10, 0],
-      transition: { duration: 0.5},
+      transition: { duration: 0.5, ease: 'easeInOut' },
     },
   };
 
