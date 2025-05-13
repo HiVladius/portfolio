@@ -1,11 +1,19 @@
 import { useLocation, Link } from 'react-router-dom';
 import { User, Code, Mail, Home } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export function Navbar() {
   const location = useLocation();
   const isHome = location.pathname === '/';
 
   if (isHome) return null;
+
+  const shakeAnimation = {
+    whileHover: {
+      rotate: [0, -10, 10, -10, 10, 0],
+      transition: { duration: 0.5},
+    },
+  };
 
   return (
     <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-zinc-900/90 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-white/10">
@@ -16,7 +24,9 @@ export function Navbar() {
             className="text-white/60 hover:text-white transition-colors"
             title="Home"
           >
-            <Home size={24} />
+            <motion.div {...shakeAnimation}>
+              <Home size={24} />
+            </motion.div>
           </Link>
         </li>
         <li>
@@ -27,7 +37,9 @@ export function Navbar() {
             }`}
             title="About"
           >
-            <User size={24} />
+            <motion.div {...shakeAnimation}>
+              <User size={24} />
+            </motion.div>
           </Link>
         </li>
         <li>
@@ -38,7 +50,9 @@ export function Navbar() {
             }`}
             title="Projects"
           >
-            <Code size={24} />
+            <motion.div {...shakeAnimation}>
+              <Code size={24} />
+            </motion.div>
           </Link>
         </li>
         <li>
@@ -49,7 +63,9 @@ export function Navbar() {
             }`}
             title="Contact"
           >
-            <Mail size={24} />
+            <motion.div {...shakeAnimation}>
+              <Mail size={24} />
+            </motion.div>
           </Link>
         </li>
       </ul>
