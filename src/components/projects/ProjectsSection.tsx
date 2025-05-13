@@ -15,6 +15,32 @@ interface GitHubRepo {
   topics: string[];
 }
 
+// Utilidad para mostrar el tiempo transcurrido desde la última actualización
+function timeAgo(dateString: string | null) {
+  if (!dateString) return "";
+  const now = new Date();
+  const updated = new Date(dateString);
+  const seconds = Math.floor((now.getTime() - updated.getTime()) / 1000);
+
+  const intervals: [number, string][] = [
+    [60, "segundo"],
+    [60, "minuto"],
+    [24, "hora"],
+    [30, "día"],
+    [12, "mes"],
+    [Number.POSITIVE_INFINITY, "año"],
+  ];
+
+  let i = 0;
+  let value = seconds;
+  while (i < intervals.length - 1 && value >= intervals[i][0]) {
+    value = Math.floor(value / intervals[i][0]);
+    i++;
+  }
+  const label = intervals[i][1];
+  return `hace ${value} ${label}${value !== 1 ? "s" : ""}`;
+}
+
 export const ProjectsSection = () => {
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,12 +53,12 @@ export const ProjectsSection = () => {
     const fetchRepos = async () => {
       try {
         const octokit = new Octokit({
-          auth: import.meta.env.VITE_GITHUB_KEY, // You'll need to add this to your .env file
+          auth: import.meta.env.VITE_GITHUB_KEY,
         });
 
         const response = await octokit.request("GET /user/repos", {
           sort: "updated",
-          per_page: 10, // Cargar 10 repositorios por página
+          per_page: 10,
           page,
           visibility: "public",
         });
@@ -61,7 +87,7 @@ export const ProjectsSection = () => {
           const allRepos = [...prevRepos, ...reposWithTopics];
           const uniqueRepos = allRepos.filter(
             (repo, index, self) =>
-              self.findIndex((r) => r.id === repo.id) === index
+              self.findIndex((r) => r.id === repo.id) === index,
           );
           return uniqueRepos;
         });
@@ -124,6 +150,9 @@ export const ProjectsSection = () => {
         My GitHub Projects
       </h1>
       <div className="mb-4">
+        <p>Solo se mostraran proyecto publicos</p>
+      </div>
+      <div className="mb-4">
         <label
           htmlFor="language"
           className="block text-sm font-medium text-gray-400"
@@ -147,7 +176,7 @@ export const ProjectsSection = () => {
               <option key={language} value={language || ""}>
                 {language}
               </option>
-            )
+            ),
           )}
         </select>
       </div>
@@ -209,8 +238,9 @@ export const ProjectsSection = () => {
                 <div className="flex items-center gap-1">
                   <Clock size={16} />
                   <span>
-                    Updated{"  "}
-                    {new Date(repo.updated_at ?? "").toLocaleDateString()}
+                    {repo.updated_at
+                      ? `Updated ${timeAgo(repo.updated_at)}`
+                      : "No updates"}
                   </span>
                 </div>
               </div>
@@ -218,7 +248,7 @@ export const ProjectsSection = () => {
           </div>
         ))}
       </div>
-      {loading ? <LoadingSpinner /> : null} 
+      {loading ? <LoadingSpinner /> : null}
       <div id="load-more" className="h-10"></div>
     </div>
   );
