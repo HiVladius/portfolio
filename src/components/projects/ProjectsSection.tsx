@@ -1,132 +1,26 @@
-import { useEffect, useRef, useState } from "react";
-import { Octokit } from "octokit";
 import { Clock, ExternalLink, GitFork, Star } from "lucide-react";
 import { LoadingSpinner } from "./LoadingSpinner";
-
-interface GitHubRepo {
-  id: number;
-  name: string;
-  description: string;
-  html_url: string;
-  stargazers_count: number;
-  forks_count: number;
-  language: string | null;
-  updated_at: string | null;
-  topics: string[];
-}
-
-// Utilidad para mostrar el tiempo transcurrido desde la última actualización
-function timeAgo(dateString: string | null) {
-  if (!dateString) return "";
-  const now = new Date();
-  const updated = new Date(dateString);
-  const seconds = Math.floor((now.getTime() - updated.getTime()) / 1000);
-
-  const intervals: [number, string][] = [
-    [60, "segundo"],
-    [60, "minuto"],
-    [24, "hora"],
-    [30, "día"],
-    [12, "mes"],
-    [Number.POSITIVE_INFINITY, "año"],
-  ];
-
-  let i = 0;
-  let value = seconds;
-  while (i < intervals.length - 1 && value >= intervals[i][0]) {
-    value = Math.floor(value / intervals[i][0]);
-    i++;
-  }
-  const label = intervals[i][1];
-  return `hace ${value} ${label}${value !== 1 ? "s" : ""}`;
-}
+import { timeAgo } from "../../helpers/timeAgo";
+import { useGitHubRepos } from "../../hooks/useGitHubRepos";
 
 export const ProjectsSection = () => {
-  const [repos, setRepos] = useState<GitHubRepo[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
-  const observer = useRef<IntersectionObserver | null>(null);
+  const {
+    repos: filteredRepos,
+    loading,
+    error,
+    loadMoreRef,
+    languages,
+    selectedLanguage,
+    setSelectedLanguage,
+    resetAndSearch,
+    isFirstPageLoading
+  } = useGitHubRepos({
+    perPage: 10,
+    sort: 'updated',
+    visibility: 'public'
+  });
 
-  useEffect(() => {
-    const fetchRepos = async () => {
-      try {
-        const octokit = new Octokit({
-          auth: import.meta.env.VITE_GITHUB_KEY,
-        });
-
-        const response = await octokit.request("GET /user/repos", {
-          sort: "updated",
-          per_page: 10,
-          page,
-          visibility: "public",
-        });
-
-        const reposWithTopics = await Promise.all(
-          response.data.map(async (repo) => {
-            const topicsResponse = await octokit.request(
-              "GET /repos/{owner}/{repo}/topics",
-              {
-                owner: repo.owner.login,
-                repo: repo.name,
-                headers: {
-                  "X-GitHub-Api-Version": "2022-11-28",
-                },
-              },
-            );
-            return {
-              ...repo,
-              topics: topicsResponse.data.names,
-              description: repo.description ?? "",
-            };
-          }),
-        );
-
-        setRepos((prevRepos) => {
-          const allRepos = [...prevRepos, ...reposWithTopics];
-          const uniqueRepos = allRepos.filter(
-            (repo, index, self) =>
-              self.findIndex((r) => r.id === repo.id) === index,
-          );
-          return uniqueRepos;
-        });
-        setLoading(false);
-      } catch (err) {
-        setError("Failed to fetch GitHub repositories");
-        setLoading(false);
-        console.error("Error fetching repos:", err);
-      }
-    };
-
-    fetchRepos();
-  }, [page]);
-
-  useEffect(() => {
-    if (observer.current) observer.current.disconnect();
-
-    const handleObserver = (entries: IntersectionObserverEntry[]) => {
-      const target = entries[0];
-      if (target.isIntersecting) {
-        setPage((prevPage) => prevPage + 1);
-      }
-    };
-
-    observer.current = new IntersectionObserver(handleObserver);
-
-    const element = document.querySelector("#load-more");
-    if (element) observer.current.observe(element);
-
-    return () => {
-      if (observer.current) observer.current.disconnect();
-    };
-  }, [repos]);
-
-  const filteredRepos = selectedLanguage
-    ? repos.filter((repo) => repo.language === selectedLanguage)
-    : repos;
-
-  if (loading && page === 1) {
+  if (isFirstPageLoading) {
     return (
       <div className="min-h-screen bg-black text-white p-8 flex items-center justify-center">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-red-500">
@@ -149,10 +43,10 @@ export const ProjectsSection = () => {
       <h1 className="text-4xl font-bold mb-12 animate-fade-in flex items-center gap-2">
         My GitHub Projects
       </h1>
-      <div className="mb-4">
-        <p>Solo se mostraran proyecto publicos</p>
+      <div className="mb-7">
+        <p>Only show the public works</p>
       </div>
-      <div className="mb-4">
+      <div className="mb-4 ">
         <label
           htmlFor="language"
           className="block text-sm font-medium text-gray-400"
@@ -166,12 +60,11 @@ export const ProjectsSection = () => {
           value={selectedLanguage}
           onChange={(e) => {
             setSelectedLanguage(e.target.value);
-            setPage(1);
-            setRepos([]);
+            resetAndSearch();
           }}
         >
           <option value="">All Languages</option>
-          {[...new Set(repos.map((repo) => repo.language).filter(Boolean))].map(
+          {languages.map(
             (language) => (
               <option key={language} value={language || ""}>
                 {language}
@@ -249,7 +142,7 @@ export const ProjectsSection = () => {
         ))}
       </div>
       {loading ? <LoadingSpinner /> : null}
-      <div id="load-more" className="h-10"></div>
+      <div ref={loadMoreRef} className="h-10"></div>
     </div>
   );
 };
